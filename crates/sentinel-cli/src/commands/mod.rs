@@ -8,6 +8,7 @@ pub mod check;
 pub mod cost_matrix;
 pub mod diff;
 pub mod doctor;
+pub mod diff_networks;
 pub mod forecast;
 pub mod generate_workflow;
 pub mod init;
@@ -27,6 +28,7 @@ pub use bundle::run_bundle;
 pub use check::run_check;
 pub use cost_matrix::run_cost_matrix;
 pub use diff::run_diff_reports;
+pub use diff_networks::run_diff_networks;
 pub use forecast::run_forecast;
 pub use generate_workflow::run_generate_workflow;
 pub use init::run_init;
@@ -38,3 +40,6 @@ pub use scan::{
     EXIT_INVALID_ARGS, EXIT_OK, EXIT_RPC_FAILURE, EXIT_WARN,
 };
 pub use service::run_install_service;
+
+pub mod top_consumers;
+pub use top_consumers::run_top_consumers;
