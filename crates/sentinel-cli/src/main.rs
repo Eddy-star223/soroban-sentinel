@@ -73,6 +73,8 @@ async fn main() {
         Commands::Doctor(args) => commands::doctor::run_doctor(args).await,
         Commands::Watch(args) => commands::watch::run_watch(*args).await,
         Commands::Forecast(args) => commands::run_forecast(args).await,
+        Commands::AuditLimits(args) => commands::run_audit_limits(args).await,
+        Commands::GenerateGithubWorkflow(args) => commands::run_generate_workflow(args),
     };
 
     // Flush buffered spans/metrics before exiting, since `process::exit`

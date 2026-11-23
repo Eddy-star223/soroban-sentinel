@@ -9,7 +9,9 @@ pub mod compare;
 pub mod debt;
 pub mod entry;
 pub mod footprint;
+pub mod half_life;
 pub mod key_pattern;
+pub mod key_trie;
 pub mod network_limits;
 pub mod planner;
 pub mod recommend;
@@ -32,11 +34,19 @@ pub use compare::{
 pub use debt::{RentDebt, RentDebtCalculator};
 pub use entry::{Durability, EntryType, InstanceStorageBreakdown, SacAssetInfo, StorageEntry};
 pub use footprint::{AtRiskFootprint, FootprintAccess, FootprintValidation, FootprintValidator};
+pub use half_life::{
+    fixed_point_exp_neg, DepletionStep, RetentionMode, StorageChurnModel, FIXED_POINT_SCALE,
+    LN_2_SCALED,
+};
 pub use key_pattern::{
     parse_key_pattern, KeyPattern, KeyPatternCandidateInput, KeyPatternToken,
     MAX_KEY_PATTERN_CANDIDATES, MAX_KEY_PATTERN_LEN,
 };
-pub use network_limits::NetworkLimits;
+pub use key_trie::{KeyNamespaceTrie, NamespaceStats, PrefixCollision, TrieNode};
+pub use network_limits::{
+    NetworkLimits, LIMIT_WARN_THRESHOLD_PERCENT, MAX_CONTRACT_DATA_ENTRY_SIZE_BYTES,
+    MAX_CONTRACT_SIZE_BYTES,
+};
 pub use planner::{
     plan_extension, plan_extension_with_cost, DeferralReason, DeferredExtension, ExtensionPlan,
     ExtensionPlanRequest, PlannedExtension,
@@ -60,6 +70,6 @@ pub use storage_audit::{
 pub use ttl::{
     calculate_remaining_ledgers, estimate_horizon_days, estimate_horizon_days_with_velocity,
     estimate_remaining_days, estimate_remaining_seconds, estimate_remaining_seconds_with_velocity,
-    SECONDS_PER_DAY, TARGET_LEDGER_CLOSE_SECONDS,
+    estimate_retention_after_churn_scaled, SECONDS_PER_DAY, TARGET_LEDGER_CLOSE_SECONDS,
 };
 pub use wasm_analysis::{analyze_wasm_sections, WasmAnalysis, WasmSectionSizes};
