@@ -505,18 +505,20 @@ impl<R: LedgerReader> ScanContractUseCase<R> {
                 let remaining_days = estimate_remaining_days(remaining_seconds);
                 let status = evaluate_risk(remaining_ledgers, &request.threshold_config);
 
-                reports.push(StorageEntryReport::new(
-                    "code_wasm",
-                    EntryType::ContractCode,
-                    Durability::Code,
-                    byte_size,
-                    live_until,
-                    remaining_ledgers,
-                    remaining_seconds,
-                    remaining_days,
-                    status,
-                )
-                .with_contract_code_size_bytes(contract_code_size_bytes));
+                reports.push(
+                    StorageEntryReport::new(
+                        "code_wasm",
+                        EntryType::ContractCode,
+                        Durability::Code,
+                        byte_size,
+                        live_until,
+                        remaining_ledgers,
+                        remaining_seconds,
+                        remaining_days,
+                        status,
+                    )
+                    .with_contract_code_size_bytes(contract_code_size_bytes),
+                );
             } else {
                 // Missing/archived code entry
                 reports.push(StorageEntryReport::new(

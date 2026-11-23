@@ -70,30 +70,36 @@ async fn test_audit_limits_compliant_contract_passes() {
     let contract = stellar_strkey::Contract(contract_id).to_string();
     let instance_key = sentinel_core::derive_contract_instance_key(&contract_id).unwrap();
 
-    Mock::given(method("POST")).and(path("/")).respond_with(move |req: &wiremock::Request| {
-        let body: serde_json::Value = serde_json::from_slice(&req.body).unwrap();
-        match body["method"].as_str().unwrap() {
-            "getLatestLedger" => ResponseTemplate::new(200).set_body_json(serde_json::json!({
-                "jsonrpc": "2.0",
-                "id": 1,
-                "result": {"sequence": 5_400_000, "protocolVersion": 22}
-            })),
-            "getLedgerEntries" => ResponseTemplate::new(200).set_body_json(serde_json::json!({
-                "jsonrpc": "2.0",
-                "id": 1,
-                "result": {
-                    "latestLedger": 5_400_000,
-                    "entries": [{
-                        "key": instance_key,
-                        "xdr": make_instance_xdr(contract_id),
-                        "liveUntilLedgerSeq": 5_500_000,
-                        "lastModifiedLedgerSeq": 5_390_000
-                    }]
-                }
-            })),
-            _ => ResponseTemplate::new(200).set_body_json(serde_json::json!({"jsonrpc": "2.0", "id": 1, "result": {"entries": []}})),
-        }
-    }).mount(&mock).await;
+    Mock::given(method("POST"))
+        .and(path("/"))
+        .respond_with(move |req: &wiremock::Request| {
+            let body: serde_json::Value = serde_json::from_slice(&req.body).unwrap();
+            match body["method"].as_str().unwrap() {
+                "getLatestLedger" => ResponseTemplate::new(200).set_body_json(serde_json::json!({
+                    "jsonrpc": "2.0",
+                    "id": 1,
+                    "result": {"sequence": 5_400_000, "protocolVersion": 22}
+                })),
+                "getLedgerEntries" => ResponseTemplate::new(200).set_body_json(serde_json::json!({
+                    "jsonrpc": "2.0",
+                    "id": 1,
+                    "result": {
+                        "latestLedger": 5_400_000,
+                        "entries": [{
+                            "key": instance_key,
+                            "xdr": make_instance_xdr(contract_id),
+                            "liveUntilLedgerSeq": 5_500_000,
+                            "lastModifiedLedgerSeq": 5_390_000
+                        }]
+                    }
+                })),
+                _ => ResponseTemplate::new(200).set_body_json(
+                    serde_json::json!({"jsonrpc": "2.0", "id": 1, "result": {"entries": []}}),
+                ),
+            }
+        })
+        .mount(&mock)
+        .await;
 
     Command::cargo_bin("sentinel")
         .unwrap()
@@ -107,7 +113,9 @@ async fn test_audit_limits_compliant_contract_passes() {
         ])
         .assert()
         .code(0)
-        .stdout(predicate::str::contains("Storage Protocol Ceilings Scorecard"))
+        .stdout(predicate::str::contains(
+            "Storage Protocol Ceilings Scorecard",
+        ))
         .stdout(predicate::str::contains("PASS"))
         .stdout(predicate::str::contains("ContractInstance"));
 }
@@ -123,38 +131,44 @@ async fn test_audit_limits_warning_threshold_exceeded() {
     // 55_000 bytes is > 80% of 65_536 (52_428 bytes), so it triggers WARN
     let warn_xdr = make_persistent_xdr(contract_id, 55_000);
 
-    Mock::given(method("POST")).and(path("/")).respond_with(move |req: &wiremock::Request| {
-        let body: serde_json::Value = serde_json::from_slice(&req.body).unwrap();
-        match body["method"].as_str().unwrap() {
-            "getLatestLedger" => ResponseTemplate::new(200).set_body_json(serde_json::json!({
-                "jsonrpc": "2.0",
-                "id": 1,
-                "result": {"sequence": 5_400_000, "protocolVersion": 22}
-            })),
-            "getLedgerEntries" => ResponseTemplate::new(200).set_body_json(serde_json::json!({
-                "jsonrpc": "2.0",
-                "id": 1,
-                "result": {
-                    "latestLedger": 5_400_000,
-                    "entries": [
-                        {
-                            "key": instance_key,
-                            "xdr": make_instance_xdr(contract_id),
-                            "liveUntilLedgerSeq": 5_500_000,
-                            "lastModifiedLedgerSeq": 5_390_000
-                        },
-                        {
-                            "key": persistent_key,
-                            "xdr": warn_xdr,
-                            "liveUntilLedgerSeq": 5_500_000,
-                            "lastModifiedLedgerSeq": 5_390_000
-                        }
-                    ]
-                }
-            })),
-            _ => ResponseTemplate::new(200).set_body_json(serde_json::json!({"jsonrpc": "2.0", "id": 1, "result": {"entries": []}})),
-        }
-    }).mount(&mock).await;
+    Mock::given(method("POST"))
+        .and(path("/"))
+        .respond_with(move |req: &wiremock::Request| {
+            let body: serde_json::Value = serde_json::from_slice(&req.body).unwrap();
+            match body["method"].as_str().unwrap() {
+                "getLatestLedger" => ResponseTemplate::new(200).set_body_json(serde_json::json!({
+                    "jsonrpc": "2.0",
+                    "id": 1,
+                    "result": {"sequence": 5_400_000, "protocolVersion": 22}
+                })),
+                "getLedgerEntries" => ResponseTemplate::new(200).set_body_json(serde_json::json!({
+                    "jsonrpc": "2.0",
+                    "id": 1,
+                    "result": {
+                        "latestLedger": 5_400_000,
+                        "entries": [
+                            {
+                                "key": instance_key,
+                                "xdr": make_instance_xdr(contract_id),
+                                "liveUntilLedgerSeq": 5_500_000,
+                                "lastModifiedLedgerSeq": 5_390_000
+                            },
+                            {
+                                "key": persistent_key,
+                                "xdr": warn_xdr,
+                                "liveUntilLedgerSeq": 5_500_000,
+                                "lastModifiedLedgerSeq": 5_390_000
+                            }
+                        ]
+                    }
+                })),
+                _ => ResponseTemplate::new(200).set_body_json(
+                    serde_json::json!({"jsonrpc": "2.0", "id": 1, "result": {"entries": []}}),
+                ),
+            }
+        })
+        .mount(&mock)
+        .await;
 
     Command::cargo_bin("sentinel")
         .unwrap()
@@ -183,38 +197,44 @@ async fn test_audit_limits_ceiling_breach_returns_exit_code_2() {
     // 70_000 bytes breaches the 64 KB (65_536 bytes) network ceiling -> FAIL
     let breach_xdr = make_persistent_xdr(contract_id, 70_000);
 
-    Mock::given(method("POST")).and(path("/")).respond_with(move |req: &wiremock::Request| {
-        let body: serde_json::Value = serde_json::from_slice(&req.body).unwrap();
-        match body["method"].as_str().unwrap() {
-            "getLatestLedger" => ResponseTemplate::new(200).set_body_json(serde_json::json!({
-                "jsonrpc": "2.0",
-                "id": 1,
-                "result": {"sequence": 5_400_000, "protocolVersion": 22}
-            })),
-            "getLedgerEntries" => ResponseTemplate::new(200).set_body_json(serde_json::json!({
-                "jsonrpc": "2.0",
-                "id": 1,
-                "result": {
-                    "latestLedger": 5_400_000,
-                    "entries": [
-                        {
-                            "key": instance_key,
-                            "xdr": make_instance_xdr(contract_id),
-                            "liveUntilLedgerSeq": 5_500_000,
-                            "lastModifiedLedgerSeq": 5_390_000
-                        },
-                        {
-                            "key": persistent_key,
-                            "xdr": breach_xdr,
-                            "liveUntilLedgerSeq": 5_500_000,
-                            "lastModifiedLedgerSeq": 5_390_000
-                        }
-                    ]
-                }
-            })),
-            _ => ResponseTemplate::new(200).set_body_json(serde_json::json!({"jsonrpc": "2.0", "id": 1, "result": {"entries": []}})),
-        }
-    }).mount(&mock).await;
+    Mock::given(method("POST"))
+        .and(path("/"))
+        .respond_with(move |req: &wiremock::Request| {
+            let body: serde_json::Value = serde_json::from_slice(&req.body).unwrap();
+            match body["method"].as_str().unwrap() {
+                "getLatestLedger" => ResponseTemplate::new(200).set_body_json(serde_json::json!({
+                    "jsonrpc": "2.0",
+                    "id": 1,
+                    "result": {"sequence": 5_400_000, "protocolVersion": 22}
+                })),
+                "getLedgerEntries" => ResponseTemplate::new(200).set_body_json(serde_json::json!({
+                    "jsonrpc": "2.0",
+                    "id": 1,
+                    "result": {
+                        "latestLedger": 5_400_000,
+                        "entries": [
+                            {
+                                "key": instance_key,
+                                "xdr": make_instance_xdr(contract_id),
+                                "liveUntilLedgerSeq": 5_500_000,
+                                "lastModifiedLedgerSeq": 5_390_000
+                            },
+                            {
+                                "key": persistent_key,
+                                "xdr": breach_xdr,
+                                "liveUntilLedgerSeq": 5_500_000,
+                                "lastModifiedLedgerSeq": 5_390_000
+                            }
+                        ]
+                    }
+                })),
+                _ => ResponseTemplate::new(200).set_body_json(
+                    serde_json::json!({"jsonrpc": "2.0", "id": 1, "result": {"entries": []}}),
+                ),
+            }
+        })
+        .mount(&mock)
+        .await;
 
     // Must return exit code 2 if any ceiling is breached
     Command::cargo_bin("sentinel")
@@ -304,30 +324,36 @@ async fn test_audit_limits_json_format() {
     let contract = stellar_strkey::Contract(contract_id).to_string();
     let instance_key = sentinel_core::derive_contract_instance_key(&contract_id).unwrap();
 
-    Mock::given(method("POST")).and(path("/")).respond_with(move |req: &wiremock::Request| {
-        let body: serde_json::Value = serde_json::from_slice(&req.body).unwrap();
-        match body["method"].as_str().unwrap() {
-            "getLatestLedger" => ResponseTemplate::new(200).set_body_json(serde_json::json!({
-                "jsonrpc": "2.0",
-                "id": 1,
-                "result": {"sequence": 5_400_000, "protocolVersion": 22}
-            })),
-            "getLedgerEntries" => ResponseTemplate::new(200).set_body_json(serde_json::json!({
-                "jsonrpc": "2.0",
-                "id": 1,
-                "result": {
-                    "latestLedger": 5_400_000,
-                    "entries": [{
-                        "key": instance_key,
-                        "xdr": make_instance_xdr(contract_id),
-                        "liveUntilLedgerSeq": 5_500_000,
-                        "lastModifiedLedgerSeq": 5_390_000
-                    }]
-                }
-            })),
-            _ => ResponseTemplate::new(200).set_body_json(serde_json::json!({"jsonrpc": "2.0", "id": 1, "result": {"entries": []}})),
-        }
-    }).mount(&mock).await;
+    Mock::given(method("POST"))
+        .and(path("/"))
+        .respond_with(move |req: &wiremock::Request| {
+            let body: serde_json::Value = serde_json::from_slice(&req.body).unwrap();
+            match body["method"].as_str().unwrap() {
+                "getLatestLedger" => ResponseTemplate::new(200).set_body_json(serde_json::json!({
+                    "jsonrpc": "2.0",
+                    "id": 1,
+                    "result": {"sequence": 5_400_000, "protocolVersion": 22}
+                })),
+                "getLedgerEntries" => ResponseTemplate::new(200).set_body_json(serde_json::json!({
+                    "jsonrpc": "2.0",
+                    "id": 1,
+                    "result": {
+                        "latestLedger": 5_400_000,
+                        "entries": [{
+                            "key": instance_key,
+                            "xdr": make_instance_xdr(contract_id),
+                            "liveUntilLedgerSeq": 5_500_000,
+                            "lastModifiedLedgerSeq": 5_390_000
+                        }]
+                    }
+                })),
+                _ => ResponseTemplate::new(200).set_body_json(
+                    serde_json::json!({"jsonrpc": "2.0", "id": 1, "result": {"entries": []}}),
+                ),
+            }
+        })
+        .mount(&mock)
+        .await;
 
     let output = Command::cargo_bin("sentinel")
         .unwrap()

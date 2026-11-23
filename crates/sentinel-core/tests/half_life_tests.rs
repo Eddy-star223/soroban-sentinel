@@ -81,14 +81,14 @@ fn test_mathematical_convergence_across_diverse_churn_rates() {
     // Unit tests verify mathematical convergence across diverse entry churn rates (0.01 <= lambda <= 0.5)
 
     let test_lambdas_scaled = [
-        10_000, 20_000, 50_000, 75_000, 100_000, 150_000, 200_000, 250_000, 300_000,
-        400_000, 500_000,
+        10_000, 20_000, 50_000, 75_000, 100_000, 150_000, 200_000, 250_000, 300_000, 400_000,
+        500_000,
     ];
 
     for &lambda_scaled in &test_lambdas_scaled {
         let model = StorageChurnModel::from_scaled_lambda(lambda_scaled);
         assert!(
-            lambda_scaled >= 10_000 && lambda_scaled <= 500_000,
+            (10_000..=500_000).contains(&lambda_scaled),
             "lambda_scaled {} out of expected range for lambda {}",
             lambda_scaled,
             lambda_scaled
@@ -103,8 +103,8 @@ fn test_mathematical_convergence_across_diverse_churn_rates() {
 
         // At exactly 1 half-life (t = t_1/2), expected retention fraction is 0.5 (500_000 / 1_000_000).
         // Let's test fixed_point_exp_neg at x = lambda * t_1/2 = ln(2):
-        let x_at_half_life = (lambda_scaled as u128 * half_life_scaled as u128
-            / FIXED_POINT_SCALE as u128) as u64;
+        let x_at_half_life =
+            (lambda_scaled as u128 * half_life_scaled as u128 / FIXED_POINT_SCALE as u128) as u64;
         // x_at_half_life should be extremely close to LN_2_SCALED
         assert!(
             (x_at_half_life as i64 - LN_2_SCALED as i64).abs() <= 2,

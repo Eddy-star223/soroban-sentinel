@@ -28,7 +28,10 @@ fn test_hierarchical_key_tree_indexing() {
         trie.get("user:profile:alice").map(|e| e.byte_size()),
         Some(120)
     );
-    assert_eq!(trie.get("user:profile:bob").map(|e| e.byte_size()), Some(140));
+    assert_eq!(
+        trie.get("user:profile:bob").map(|e| e.byte_size()),
+        Some(140)
+    );
     assert_eq!(
         trie.get("user:settings:theme").map(|e| e.byte_size()),
         Some(50)

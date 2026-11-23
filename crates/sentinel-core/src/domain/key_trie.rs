@@ -92,7 +92,7 @@ impl KeyNamespaceTrie {
         if key.is_empty() {
             return Vec::new();
         }
-        key.split(|c| c == ':' || c == '/')
+        key.split([':', '/'])
             .filter(|s| !s.is_empty())
             .map(|s| s.to_string())
             .collect()
@@ -105,11 +105,7 @@ impl KeyNamespaceTrie {
     }
 
     /// Inserts a `StorageEntry` using an explicit slice of key components / segments.
-    pub fn insert_with_segments<S: AsRef<str>>(
-        &mut self,
-        segments: &[S],
-        entry: StorageEntry,
-    ) {
+    pub fn insert_with_segments<S: AsRef<str>>(&mut self, segments: &[S], entry: StorageEntry) {
         let mut curr = &mut self.root;
         for seg in segments {
             let segment = seg.as_ref();

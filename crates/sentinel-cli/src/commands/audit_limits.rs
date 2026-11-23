@@ -8,8 +8,8 @@
 //! Outputs a compliance scorecard table with status indicators (`PASS`, `WARN`, `FAIL`)
 //! and returns exit code 2 if any ceiling is breached.
 
-use std::time::Duration;
 use serde::{Deserialize, Serialize};
+use std::time::Duration;
 
 use sentinel_core::adapters::{parse_contract_id, parse_key_expr, SorobanRpcClient};
 use sentinel_core::domain::{
@@ -244,10 +244,9 @@ pub async fn run_audit_limits(args: AuditLimitsArgs) -> i32 {
     let mut rows = Vec::new();
 
     // 1. Check contract instance entry size
-    let instance_entry = scan
-        .entries
-        .iter()
-        .find(|e| e.entry_type == EntryType::ContractInstance || e.durability == Durability::Instance);
+    let instance_entry = scan.entries.iter().find(|e| {
+        e.entry_type == EntryType::ContractInstance || e.durability == Durability::Instance
+    });
     if let Some(inst) = instance_entry {
         rows.push(evaluate_limit_compliance(
             "ContractInstance",
@@ -353,9 +352,18 @@ pub async fn run_audit_limits(args: AuditLimitsArgs) -> i32 {
         }
     }
 
-    let passed_count = rows.iter().filter(|r| r.status == ComplianceStatus::Pass).count();
-    let warning_count = rows.iter().filter(|r| r.status == ComplianceStatus::Warn).count();
-    let breached_count = rows.iter().filter(|r| r.status == ComplianceStatus::Fail).count();
+    let passed_count = rows
+        .iter()
+        .filter(|r| r.status == ComplianceStatus::Pass)
+        .count();
+    let warning_count = rows
+        .iter()
+        .filter(|r| r.status == ComplianceStatus::Warn)
+        .count();
+    let breached_count = rows
+        .iter()
+        .filter(|r| r.status == ComplianceStatus::Fail)
+        .count();
 
     let overall_status = if breached_count > 0 {
         ComplianceStatus::Fail
@@ -418,7 +426,8 @@ mod tests {
         let row_fail = evaluate_limit_compliance("entry3", "persistent", 65_537, 65_536);
         assert_eq!(row_fail.status, ComplianceStatus::Fail);
 
-        let row_huge = evaluate_limit_compliance("entry4", "persistent", usize::MAX, usize::MAX - 1);
+        let row_huge =
+            evaluate_limit_compliance("entry4", "persistent", usize::MAX, usize::MAX - 1);
         assert_eq!(row_huge.status, ComplianceStatus::Fail);
     }
 }

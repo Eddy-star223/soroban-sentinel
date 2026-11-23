@@ -766,7 +766,10 @@ mod tests {
 
     #[test]
     fn test_fail_on_critical_risk_only_fails_at_critical_or_archived() {
-        assert_eq!(resolve_scan_exit_code(RiskLevel::Ok, true, false, false), EXIT_OK);
+        assert_eq!(
+            resolve_scan_exit_code(RiskLevel::Ok, true, false, false),
+            EXIT_OK
+        );
         assert_eq!(
             resolve_scan_exit_code(RiskLevel::Warn, true, false, false),
             EXIT_OK

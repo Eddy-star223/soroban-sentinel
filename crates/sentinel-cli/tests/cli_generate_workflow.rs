@@ -28,7 +28,10 @@ fn test_generate_workflow_default_options() {
         .success()
         .stdout(predicate::str::contains("Successfully generated"));
 
-    let workflow_path = dir.join(".github").join("workflows").join("sentinel-ttl-audit.yml");
+    let workflow_path = dir
+        .join(".github")
+        .join("workflows")
+        .join("sentinel-ttl-audit.yml");
     assert!(workflow_path.exists());
 
     let contents = fs::read_to_string(&workflow_path).unwrap();
@@ -65,7 +68,10 @@ fn test_generate_workflow_custom_cron_and_network() {
         .assert()
         .success();
 
-    let workflow_path = dir.join(".github").join("workflows").join("sentinel-ttl-audit.yml");
+    let workflow_path = dir
+        .join(".github")
+        .join("workflows")
+        .join("sentinel-ttl-audit.yml");
     assert!(workflow_path.exists());
 
     let contents = fs::read_to_string(&workflow_path).unwrap();
@@ -99,11 +105,18 @@ fn test_generate_workflow_force_overwrite_protection() {
     // With --force: overwrites successfully
     Command::cargo_bin("sentinel")
         .unwrap()
-        .args(["generate-github-workflow", "--out-dir", dir.to_str().unwrap(), "--force"])
+        .args([
+            "generate-github-workflow",
+            "--out-dir",
+            dir.to_str().unwrap(),
+            "--force",
+        ])
         .assert()
         .success();
 
-    assert!(fs::read_to_string(&target).unwrap().contains("Sentinel TTL Audit"));
+    assert!(fs::read_to_string(&target)
+        .unwrap()
+        .contains("Sentinel TTL Audit"));
 
     let _ = fs::remove_dir_all(&dir);
 }

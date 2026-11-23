@@ -179,8 +179,8 @@ impl StorageChurnModel {
             let depletion_percent = if initial_volume == 0 {
                 0
             } else {
-                ((initial_volume.saturating_sub(remaining) as u128 * 100)
-                    / initial_volume as u128) as u32
+                ((initial_volume.saturating_sub(remaining) as u128 * 100) / initial_volume as u128)
+                    as u32
             };
 
             steps.push(DepletionStep {
@@ -193,7 +193,9 @@ impl StorageChurnModel {
             if current_offset == horizon_ledgers {
                 break;
             }
-            current_offset = current_offset.saturating_add(step_size).min(horizon_ledgers);
+            current_offset = current_offset
+                .saturating_add(step_size)
+                .min(horizon_ledgers);
         }
 
         steps

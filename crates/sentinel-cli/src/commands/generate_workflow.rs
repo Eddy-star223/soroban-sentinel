@@ -149,7 +149,11 @@ pub fn run_generate_workflow(args: GenerateWorkflowArgs) -> i32 {
     };
 
     if let Err(e) = file.write_all(yaml_content.as_bytes()) {
-        eprintln!("Error: failed to write to '{}': {}", target_path.display(), e);
+        eprintln!(
+            "Error: failed to write to '{}': {}",
+            target_path.display(),
+            e
+        );
         return EXIT_INVALID_ARGS;
     }
 

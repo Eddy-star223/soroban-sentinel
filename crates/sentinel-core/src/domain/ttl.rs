@@ -184,13 +184,7 @@ mod tests {
         assert!(retention > 0);
 
         assert_eq!(
-            estimate_retention_after_churn_scaled(
-                RetentionMode::Static,
-                500,
-                10_000,
-                250,
-                1_000,
-            ),
+            estimate_retention_after_churn_scaled(RetentionMode::Static, 500, 10_000, 250, 1_000,),
             750_000
         );
     }
