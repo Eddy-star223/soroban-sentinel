@@ -4,9 +4,11 @@ pub mod auth;
 pub mod failover_rpc;
 pub mod fee_bump_envelope;
 pub mod key_expr;
+pub mod sc_address;
 pub mod simulation;
 pub mod snapshot;
 pub mod soroban_rpc;
+pub mod stellar_account;
 pub mod wasm_sections;
 pub mod webhook;
 pub mod xdr_keys;
@@ -17,6 +19,7 @@ pub use auth::{
 pub use failover_rpc::{EndpointHealthSnapshot, FailoverConfig, MultiRpcFailoverReader};
 pub use fee_bump_envelope::{build_fee_bump_envelope, fee_bump_envelope_to_xdr_base64};
 pub use key_expr::{parse_key_expr, MAX_KEY_EXPR_DEPTH, MAX_KEY_EXPR_LEN};
+pub use sc_address::parse_sc_address;
 pub use simulation::{build_extend_footprint_ttl_envelope, envelope_to_xdr_base64};
 pub use snapshot::{
     ReplayReader, SentinelSnapshot, SnapshotData, SnapshotHeader, SnapshotLedgerReader,
@@ -26,6 +29,7 @@ pub use soroban_rpc::{
     validate_rpc_url, RetryPolicy, SorobanRpcClient, DEFAULT_BASE_RETRY_DELAY_MS,
     DEFAULT_MAX_RETRIES, MAX_BATCH_REQUESTS, MAX_KEYS_PER_REQUEST, MAX_RPC_RESPONSE_BYTES,
 };
+pub use stellar_account::fetch_account_signer_config;
 pub use wasm_sections::{analyze_wasm, MAX_WASM_ANALYSIS_BYTES};
 pub use webhook::WebhookAlertNotifier;
 pub use xdr_keys::{
@@ -36,6 +40,9 @@ pub use xdr_keys::{
     extract_contract_code_size, extract_instance_storage_breakdown, extract_sac_asset_info,
     extract_wasm_hash_from_instance_entry, parse_contract_id, parse_sc_address, safe_xdr_limits,
     summarize_scval, KeyPatternMatcher, XDR_MAX_BYTE_LENGTH, XDR_MAX_RECURSION_DEPTH,
+    extract_instance_storage_breakdown, extract_sac_asset_info,
+    extract_wasm_hash_from_instance_entry, parse_contract_id, safe_xdr_limits, summarize_scval,
+    KeyPatternMatcher, XDR_MAX_BYTE_LENGTH, XDR_MAX_RECURSION_DEPTH,
 };
 
 #[cfg(feature = "fuzzing")]
